@@ -27,3 +27,7 @@ Finally, it hides desktop icons for applications that will not be used in my cla
 ## How to use
 
 Download the script to the computer to set up. Then right-click on the script and select "Run as administrator".
+
+## Fun fact
+
+I know very little about batch scripting. This was almost entirely written by ChatGTP. We worked on little parts of this script at a time. I put everything together into one unified script.
