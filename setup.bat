@@ -78,7 +78,14 @@ for /L %%i in (0,1,3) do (
 
     for /F "tokens=1,*" %%a in ('echo !installerPath!') do (
         echo Installing %%a with flags !flags[%%i]!
-        start "" /wait "%%a" !flags[%%i]! %%b
+
+        if /I "!extension!"==".exe" (
+            start "" /wait "%%a" !flags[%%i]! %%b
+        ) else if /I "!extension!"==".msi" (
+            start "" /wait msiexec.exe /i "%%a" !flags[%%i]! %%b
+        ) else (
+            echo Unsupported file type: !extension! Skipping installation of %%a.
+        )
     )
 )
 
