@@ -5,14 +5,14 @@ setlocal enabledelayedexpansion
 rem Application installers and flags
 rem URLs of the installer files
 set "installers[0]=http://colorcop.net/tools/colorcop/colorcop-setup.exe"
-set "installers[1]=https://www.python.org/ftp/python/3.11.3/python-3.11.3-amd64.exe"
-set "installers[2]=https://www.bluej.org/download/files/BlueJ-windows-510.msi"
+set "installers[1]=https://www.bluej.org/download/files/BlueJ-windows-510.msi"
+set "installers[2]=https://www.python.org/ftp/python/3.11.3/python-3.11.3-amd64.exe"
 set "installers[3]=https://dl.google.com/drive-file-stream/GoogleDriveSetup.exe"
 
 rem Application installer flags
 set "flags[0]=/silent /MERGETASKS=desktopicon"
-set "flags[1]=/quiet InstallAllUsers=1 PrependPath=1 Include_test=0"
-set "flags[2]=/qn"
+set "flags[1]=/qn"
+set "flags[2]=/quiet InstallAllUsers=1 PrependPath=1 Include_test=0"
 set "flags[3]=--silent --desktop_shortcut=false --gsuite_shortcuts=false"
 
 
@@ -24,30 +24,11 @@ rem Python packages to install (separate with spaces)
 set "packages=beautifulsoup4 matplotlib nympy pygame pyinstaller python-docx requests"
 
 
-rem Desktop shortcuts to hide
-set "shortcutsToHide="
-set "shortcutsToHide=%shortcutsToHide% "Access.lnk""
-set "shortcutsToHide=%shortcutsToHide% "Acrobat Reader.lnk""
-set "shortcutsToHide=%shortcutsToHide% "Destiny Discover.url""
-set "shortcutsToHide=%shortcutsToHide% "DisableScreensaver.appref-ms""
-set "shortcutsToHide=%shortcutsToHide% "Dismissal.url""
-set "shortcutsToHide=%shortcutsToHide% "DRC INSIGHT Online Assessments.lnk""
-set "shortcutsToHide=%shortcutsToHide% "Excel.lnk""
-set "shortcutsToHide=%shortcutsToHide% "GCSD Authentication.url""
-set "shortcutsToHide=%shortcutsToHide% "Internet Explorer.lnk""
-set "shortcutsToHide=%shortcutsToHide% "JL Mann Broadcast.lnk""
-set "shortcutsToHide=%shortcutsToHide% "LockDown Browser Lab OEM.lnk""
-set "shortcutsToHide=%shortcutsToHide% "Office.lnk""
-set "shortcutsToHide=%shortcutsToHide% "OneNote.lnk""
-set "shortcutsToHide=%shortcutsToHide% "NWEA Secure Testing Browser.lnk""
-set "shortcutsToHide=%shortcutsToHide% "PowerPoint.lnk""
-set "shortcutsToHide=%shortcutsToHide% "Publisher.lnk""
-set "shortcutsToHide=%shortcutsToHide% "Raptor Staff SignIn.url""
-set "shortcutsToHide=%shortcutsToHide% "S A S.url""
-set "shortcutsToHide=%shortcutsToHide% "SCSecureBrowser.lnk""
-set "shortcutsToHide=%shortcutsToHide% "Sub""
-set "shortcutsToHide=%shortcutsToHide% "WIN Career Readiness.url""
-set "shortcutsToHide=%shortcutsToHide% "Word.lnk""
+REM List of desktop icons to keep
+set "keepIcons=HelpDesk.exe" "Audacity.lnk" "BlueJ.lnk""Chrome.lnk" "Color Cop.lnk" "HelpDesk.exe" "Idle.lnk" "Microsoft Edge.lnk" "Visual Studio Code.lnk"
+
+set "endAction="  REM Possible values: restart, shutdown. No value will keep user logged in.
+
 
 
 rem ******* END OF CONFIGURATION. DO NOT MODIFY BELOW THIS LINE! *******
@@ -61,45 +42,43 @@ mkdir "%installerDir%"
 
 for /L %%i in (0,1,3) do (
     set "installers[%%i]=!installers[%%i]!"
-    for /F "delims=" %%F in ('echo !installers[%%i]!') do (
-        set "url=%%F"
-        set "extension=!url:~-3!"
-        echo Downloading installer %%i with extension !extension!
-        bitsadmin.exe /transfer "InstallerDownload_%%i" "!installers[%%i]!" "%installerDir%\Installer_%%i.!extension!"
+    for %%F in ("!installers[%%i]!") do (
+        set "filename=%%~nxF"
+        echo Downloading installer %%i: !filename!
+        bitsadmin.exe /transfer "InstallerDownload_%%i" "!installers[%%i]!" "%installerDir%\!filename!"
         echo Installer %%i downloaded successfully.
+        set "installerPaths[%%i]=!filename!"
     )
 )
 
 echo Installing applications...
 
 for /L %%i in (0,1,3) do (
-    set "installerPath=%installerDir%\Installer_%%i.!extension!"
+    set "installerPath=%installerDir%\!installerPaths[%%i]!"
     set "flags[%%i]=!flags[%%i]!"
 
-    for /F "tokens=1,*" %%a in ('echo !installerPath!') do (
-        echo Installing %%a with flags !flags[%%i]!
-
-        if /I "!extension!"==".exe" (
+    if "!installerPath:~-4!"==".msi" (
+        echo Installing MSI installer: !installerPath!
+        msiexec.exe /i "!installerPath!" !flags[%%i]!
+    ) else (
+        for /F "tokens=1,*" %%a in ('echo !installerPath!') do (
+            echo Installing %%a with flags !flags[%%i]!
             start "" /wait "%%a" !flags[%%i]! %%b
-        ) else if /I "!extension!"==".msi" (
-            start "" /wait msiexec.exe /i "%%a" !flags[%%i]! %%b
-        ) else (
-            echo Unsupported file type: !extension! Skipping installation of %%a.
         )
     )
 )
-
-rem Delete the installers once complete
-rd /s /q "%installerDir%"
-
 
 rem Create a Desktop shortcut for IDLE because the installer doesn't provide that option
 copy "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Python 3.11\IDLE (Python 3.11 64-bit).lnk" "C:\Users\Public\Desktop"
 ren "C:\Users\Public\Desktop\IDLE (Python 3.11 64-bit).lnk" "IDLE.lnk"
 echo IDLE shortcut added to Desktop.
 
+rem Delete the installer directory
+echo Deleting installer directory...
+rd /s /q "%installerDir%"
 
-rem Install python packages that will be used in class
+
+rem Install python packages that may be used in class
 
 echo Installing Python packages...
 
@@ -118,6 +97,26 @@ for %%P in (%packages%) do (
         echo Failed to install %%P.
     )
 )
+
+
+rem Add shortcuts to Desktop for applications useful in computer programming, remove others
+
+REM Unhide everything so I can see if this script misses anything hidden by previous hiding scripts
+attrib -h -s "C:\Users\Public\Desktop\*" /A:-"C:\Users\Public\Desktop\desktop.ini"
+
+REM Get the list of all desktop icons in the User/Public folder
+for /f "tokens=*" %%i in ('dir "C:\Users\Public\Desktop\*" /b') do (
+    REM Check if the current icon is in the list of icons to keep
+    echo %keepIcons% | findstr /i "\<%%i\>" > nul
+    if not errorlevel 1 (
+        REM Icon is in the list, do not hide it
+        attrib -s -h "C:\Users\Public\Desktop\%%i"
+    ) else (
+        REM Icon is not in the list, hide it
+        attrib +s +h "C:\Users\Public\Desktop\%%i"
+    )
+)
+
 
 rem Free space by deleting student profiles that have not been used within the past year
 
@@ -143,20 +142,16 @@ for /F "delims=" %%G in ('dir "C:\Users" /B /AD') do (
     )
 )
 
-
-rem Add shortcuts to Desktop for applications useful in computer programming, remove others
-
-REM Unhide everything so I can see if this script misses anything hidden by previous hiding scripts
-attrib -h -s "C:\Users\Public\Desktop\*" /A:-"C:\Users\Public\Desktop\desktop.ini"
-
-echo Hiding unneeded Desktop shortcuts...
-
-for %%S in (%shortcutsToHide%) do (
-    echo Hiding shortcut: %%~S
-    attrib +h +s "C:\Users\Public\Desktop\%%~S"
-)
-
-
 endlocal
 
-pause
+REM Perform the specified action
+if "%doneAction%"=="restart" (
+    echo Restarting in 5 seconds
+    shutdown /r /t 5
+) else if "%doneAction%"=="shutdown" (
+    echo Shutting down in 5 seconds
+    shutdown /s /t 5
+) else (
+    echo Invalid action specified. No further action taken.
+    pause
+)
