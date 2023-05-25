@@ -2,7 +2,6 @@
 setlocal enabledelayedexpansion
 
 
-rem Application installers and flags
 rem URLs of the installer files
 set "installers[0]=http://colorcop.net/tools/colorcop/colorcop-setup.exe"
 set "installers[1]=https://www.bluej.org/download/files/BlueJ-windows-510.msi"
@@ -26,7 +25,6 @@ REM List of desktop icons to keep
 set "keepIcons=HelpDesk.exe" "Audacity.lnk" "BlueJ.lnk" "Chrome.lnk" "Color Cop.lnk" "HelpDesk.exe" "Idle.lnk" "Microsoft Edge.lnk" "Visual Studio Code.lnk"
 
 set "doneAction=restart"  REM Possible values: restart, shutdown. No value will keep the user logged in.
-
 
 
 rem ******* END OF CONFIGURATION. DO NOT MODIFY BELOW THIS LINE! *******
