@@ -8,7 +8,7 @@ First, it downloads and installs the following applications. The flags are used 
 
 ## How to use
 
-Download the script to the computer to set up. Then right-click on the script and select "Run as administrator".
+Download the script to the computer to set up. Edit the configuration section as necessary. Then right-click on the script and select "Run as administrator".
 
 ## Fun fact
 
