@@ -19,15 +19,13 @@ set "flags[3]=--silent --desktop_shortcut=false --gsuite_shortcuts=false"
 rem User profiles to keep (must be separated by commas)
 set "profilesToKeep=Administrator,Public,setup,Temp"
 
-
-rem Python packages to install (separate with spaces)
+rem Python packages to install
 set "packages=beautifulsoup4 matplotlib nympy pygame pyinstaller python-docx requests"
 
-
 REM List of desktop icons to keep
-set "keepIcons=HelpDesk.exe" "Audacity.lnk" "BlueJ.lnk""Chrome.lnk" "Color Cop.lnk" "HelpDesk.exe" "Idle.lnk" "Microsoft Edge.lnk" "Visual Studio Code.lnk"
+set "keepIcons=HelpDesk.exe" "Audacity.lnk" "BlueJ.lnk" "Chrome.lnk" "Color Cop.lnk" "HelpDesk.exe" "Idle.lnk" "Microsoft Edge.lnk" "Visual Studio Code.lnk"
 
-set "endAction="  REM Possible values: restart, shutdown. No value will keep user logged in.
+set "endAction="  REM Possible values: restart, shutdown. No value will keep the user logged in.
 
 
 
